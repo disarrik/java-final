@@ -194,7 +194,7 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     private <T> Stream<T> asStream(Function<Integer, List<T>> nextPageProvider) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<T>() {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<>() {
             final Deque<T> deque = new ArrayDeque<>();
             int offset = 0;
 
