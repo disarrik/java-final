@@ -29,7 +29,7 @@ import ru.hse.de.vkcli.api.model.wall.WallResponse;
 import ru.hse.de.vkcli.statistic.model.StatisticReport;
 
 public class StatisticServiceImpl implements StatisticService {
-    private static final int MIN_USERS_REQUIRED = 5000;
+    private static final int MAX_ENTITIES_FETCHING = 5000;
     private static final int MIN_FRIEND_OF_FRIEND_REQUIRED = 50;
     private final VkApi vkApi;
 
@@ -46,10 +46,11 @@ public class StatisticServiceImpl implements StatisticService {
         });
 
         User mostPopularUser = usersStream
-                .limit(MIN_USERS_REQUIRED)
+                .limit(MAX_ENTITIES_FETCHING)
                 .filter(User::openProfile)
                 .max(Comparator.comparingLong(user ->
                         asStream(offset -> vkApi.getFriends(user.id(), offset).friends())
+                                .limit(MAX_ENTITIES_FETCHING)
                                 .count()
                 ))
                 .orElseThrow(() -> new RuntimeException("No open profiles found"));
@@ -70,7 +71,9 @@ public class StatisticServiceImpl implements StatisticService {
         List<Friend> friends = asStream(offset -> {
             FriendsResponse response = vkApi.getFriends(userId, offset);
             return response.friends();
-        }).toList();
+        })
+                .limit(MAX_ENTITIES_FETCHING)
+                .toList();
 
         int friendsCount = friends.size();
 
@@ -122,7 +125,9 @@ public class StatisticServiceImpl implements StatisticService {
         List<Group> groups = asStream(offset -> {
             GroupsResponse response = vkApi.getGroups(userId, offset);
             return response.group();
-        }).toList();
+        })
+                .limit(MAX_ENTITIES_FETCHING)
+                .toList();
 
         int groupsCount = groups.size();
 

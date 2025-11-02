@@ -1,6 +1,5 @@
 package ru.hse.de.vkcli.cli;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -21,7 +20,7 @@ public class ReportFormatter {
         decimalFormat = new DecimalFormat("#.##", symbols);
     }
 
-    public void print(StatisticReport report, OutputStream out) throws IOException {
+    public void print(StatisticReport report, OutputStream out) {
         try (PrintWriter writer = new PrintWriter(out, true)) {
             User user = report.mostFriendlyUser();
             writer.printf("=== СТАТИСТИКА ПОЛЬЗОВАТЕЛЯ: %s %s (id: %s) ===%n",
