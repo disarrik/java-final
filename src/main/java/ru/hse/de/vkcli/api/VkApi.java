@@ -8,7 +8,7 @@ import ru.hse.de.vkcli.api.model.wall.WallResponse;
 public interface VkApi {
     UserSearchResponse getUsersFromCity(int cityCode, int offset);
 
-    FriendsResponse getFriends(int offset);
+    FriendsResponse getFriends(String userId, int offset);
 
     GroupsResponse getGroups(String userId, int offset);
 

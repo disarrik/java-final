@@ -10,35 +10,38 @@ import ru.hse.de.vkcli.api.model.wall.Post;
 import ru.hse.de.vkcli.api.model.wall.PostType;
 
 public record StatisticReport(
-        User mostFriendlyUSer,
-        FriendsReport friendsReport
+        User mostFriendlyUser,
+        FriendsReport friendsReport,
+        GroupsReport groupsReport,
+        WallStatistic wallStatistic
         ) {
 
-    record FriendsReport(
+    public record FriendsReport(
             int friendsCount,
-            BigDecimal percentOfOpenFriends,
-            Integer avgFriendsOfFriendsAmount
+            List<String> top5Cities,
+            BigDecimal percentOfClosedFriends,
+            double avgFriendsOfFriendsAmount
     ) {}
 
-    record GroupsReport(
+    public record GroupsReport(
             int groupsCount,
             List<Group> top10Groups,
-            BigDecimal avgGroupParticipants,
+            double avgGroupParticipants,
             Group bestGroup,
             Group worseGroup
     ) {}
 
-    record WallStatistic(
+    public record WallStatistic(
             int postsAmount,
             PostsStatistic postsStatistic,
             List<Post> top3Posts,
-            int avgPostCharsAmount,
+            double avgPostCharsAmount,
             Map<PostType, Integer> postTypesDistribution
     ) {
-        record PostsStatistic(
-                int avgLikes,
-                int avgReposts,
-                int avgComments
+        public record PostsStatistic(
+                double avgLikes,
+                double avgReposts,
+                double avgComments
         ) {}
     }
 }
