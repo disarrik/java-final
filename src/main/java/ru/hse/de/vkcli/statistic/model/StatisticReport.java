@@ -18,7 +18,7 @@ public record StatisticReport(
 
     public record FriendsReport(
             int friendsCount,
-            List<String> top5Cities,
+            Map<String, Long> top5Cities,
             BigDecimal percentOfClosedFriends,
             double avgFriendsOfFriendsAmount
     ) {}

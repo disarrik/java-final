@@ -6,6 +6,7 @@ import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
@@ -84,7 +85,7 @@ public class StatisticServiceImpl implements StatisticService {
                 .average()
                 .orElse(0.0);
 
-        List<String> top5Cities = friends.stream()
+        Map<String, Long> top5Cities = friends.stream()
                 .filter(friend -> friend.city() != null && !friend.city().isEmpty())
                 .collect(Collectors.groupingBy(
                         Friend::city,
@@ -93,8 +94,12 @@ public class StatisticServiceImpl implements StatisticService {
                 .entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(5)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
 
         long closedFriendsCount = friends.stream()
                 .filter(friend -> !friend.openProfile())
