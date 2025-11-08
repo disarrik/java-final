@@ -16,9 +16,13 @@ public class ConfigReader {
         }
     }
     public static String getToken() {
-        return properties.getProperty("vk.api.token");
+        return System.getenv("vk.api.token");
     }
     public static String getApiVersion() {
         return properties.getProperty("vk.api.version");
+    }
+    public static int getSleepDuration() {
+        String sleepDuration = properties.getProperty("vk.api.sleep.duration", "350");
+        return Integer.parseInt(sleepDuration);
     }
 }

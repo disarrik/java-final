@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.hse.de.vkcli.api.model.friend.Friend;
 import ru.hse.de.vkcli.api.model.friend.FriendsResponse;
 import ru.hse.de.vkcli.api.model.group.Group;
@@ -13,37 +15,39 @@ import ru.hse.de.vkcli.api.model.search.UserSearchResponse;
 import ru.hse.de.vkcli.api.model.wall.Post;
 import ru.hse.de.vkcli.api.model.wall.PostType;
 import ru.hse.de.vkcli.api.model.wall.WallResponse;
+import ru.hse.de.vkcli.config.ConfigReader;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VkApiImpl  implements VkApi {
-    public VkApiImpl(){
-        this.httpClient = HttpClient.newHttpClient();
-    }
 
+    private static final Logger LOG = LoggerFactory.getLogger(VkApiImpl.class);
     private static final int FRIENDS_PAGE_SIZE = 5;
     private static final int GROUPS_COUNT = 10;
     private static final int WALL_POSTS_COUNT = 100;
     private static final int USERS_FROM_CITY_COUNT = 10;
 
-    String accessToken = "";
+    private static final String accessToken = ConfigReader.getToken();
     private static final String BASE_URL = "https://api.vk.com/method/";
-    private static final String API_VERSION = "5.199";
+    private static final String API_VERSION = ConfigReader.getApiVersion();
+    private static final int SLEEP_DURATION = ConfigReader.getSleepDuration();
     private final HttpClient httpClient;
     private final Gson gson = new Gson();
 
+    public VkApiImpl(){
+        this.httpClient = HttpClient.newHttpClient();
+    }
+
     @Override
     public FriendsResponse getFriends(String userId, int offset){
-        System.out.println("GetFriends");
+        LOG.info("GetFriends");
         String url = BASE_URL + "friends.get" +
                 "?user_id=" + userId +
                 "&count=" + FRIENDS_PAGE_SIZE +
@@ -58,18 +62,17 @@ public class VkApiImpl  implements VkApi {
                 .build();
 
         try {
-            PrintWriter writer = new PrintWriter(System.out, true, StandardCharsets.UTF_8);
             HttpResponse<String> response = httpClient.send(
                     request,
                     HttpResponse.BodyHandlers.ofString()
             );
 
-            writer.println(response.body());
-            writer.println(mapFriendsResponse(response.body()));
-            writer.flush();
-            Thread.sleep(350);
+            LOG.debug("Response body: {}", response.body());
+            FriendsResponse friendsResponse = mapFriendsResponse(response.body());
+            LOG.info("Mapped friends response: {}", friendsResponse);
+            Thread.sleep(SLEEP_DURATION);
 
-            return mapFriendsResponse(response.body());
+            return friendsResponse;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -80,7 +83,7 @@ public class VkApiImpl  implements VkApi {
 
     @Override
     public UserSearchResponse getUsersFromCity(int cityCode, int offset) {
-        System.out.println("getUsersFromCity");
+        LOG.info("getUsersFromCity");
         String url = BASE_URL + "users.search" +
                 "?city=" + cityCode +
                 "&count=" + USERS_FROM_CITY_COUNT +
@@ -95,17 +98,17 @@ public class VkApiImpl  implements VkApi {
                 .build();
 
         try {
-            PrintWriter writer = new PrintWriter(System.out, true, StandardCharsets.UTF_8);
             HttpResponse<String> response = httpClient.send(
                     request,
                     HttpResponse.BodyHandlers.ofString()
             );
 
-            writer.println(response.body());
-            writer.println(mapUserSearchResponse(response.body()));
+            LOG.debug("Response body: {}", response.body());
+            UserSearchResponse userSearchResponse = mapUserSearchResponse(response.body());
+            LOG.info("Mapped user search response: {}", userSearchResponse);
 
-            Thread.sleep(350);
-            return mapUserSearchResponse(response.body());
+            Thread.sleep(SLEEP_DURATION);
+            return userSearchResponse;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -116,7 +119,7 @@ public class VkApiImpl  implements VkApi {
 
     @Override
     public GroupsResponse getGroups(String userId, int offset) {
-        System.out.println("getGroups");
+        LOG.info("getGroups");
         String url = BASE_URL + "groups.get" +
                 "?user_id=" + userId +
                 "&count=" + GROUPS_COUNT +
@@ -132,18 +135,17 @@ public class VkApiImpl  implements VkApi {
                 .build();
 
         try {
-            PrintWriter writer = new PrintWriter(System.out, true, StandardCharsets.UTF_8);
             HttpResponse<String> response = httpClient.send(
                     request,
                     HttpResponse.BodyHandlers.ofString()
             );
 
-            writer.println(response.body());
-            writer.println(mapGroupsResponse(response.body()));
-            writer.flush();
-            Thread.sleep(350);
+            LOG.debug("Response body: {}", response.body());
+            GroupsResponse groupsResponse = mapGroupsResponse(response.body());
+            LOG.info("Mapped groups response: {}", groupsResponse);
+            Thread.sleep(SLEEP_DURATION);
 
-            return mapGroupsResponse(response.body());
+            return groupsResponse;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -154,7 +156,7 @@ public class VkApiImpl  implements VkApi {
 
     @Override
     public WallResponse getWall(String userId, int offset) {
-        System.out.println("getWall");
+        LOG.info("getWall");
         String url = BASE_URL + "wall.get" +
                 "?owner_id=" + userId +
                 "&count=" + WALL_POSTS_COUNT +
@@ -168,18 +170,17 @@ public class VkApiImpl  implements VkApi {
                 .build();
 
         try {
-            PrintWriter writer = new PrintWriter(System.out, true, StandardCharsets.UTF_8);
             HttpResponse<String> response = httpClient.send(
                     request,
                     HttpResponse.BodyHandlers.ofString()
             );
 
-            writer.println(response.body());
-            writer.println(mapWallResponse(response.body()));
-            writer.flush();
-            Thread.sleep(350);
+            LOG.debug("Response body: {}", response.body());
+            WallResponse wallResponse = mapWallResponse(response.body());
+            LOG.info("Mapped wall response: {}", wallResponse);
+            Thread.sleep(SLEEP_DURATION);
 
-            return mapWallResponse(response.body());
+            return wallResponse;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
