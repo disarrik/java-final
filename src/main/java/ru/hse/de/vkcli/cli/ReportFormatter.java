@@ -2,6 +2,7 @@ package ru.hse.de.vkcli.cli;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -21,20 +22,19 @@ public class ReportFormatter {
     }
 
     public void print(StatisticReport report, OutputStream out) {
-        try (PrintWriter writer = new PrintWriter(out, true)) {
-            User user = report.mostFriendlyUser();
-            writer.printf("=== СТАТИСТИКА ПОЛЬЗОВАТЕЛЯ: %s %s (id: %s) ===%n",
-                    user.name(), user.surname(), user.id());
-            writer.println();
-            
-            printFriendsSection(writer, report.friendsReport());
-            writer.println();
-            
-            printGroupsSection(writer, report.groupsReport());
-            writer.println();
-            
-            printPostsSection(writer, report.wallStatistic());
-        }
+        PrintWriter writer = new PrintWriter(out, true, StandardCharsets.UTF_8);
+        User user = report.mostFriendlyUser();
+        writer.printf("=== СТАТИСТИКА ПОЛЬЗОВАТЕЛЯ: %s %s (id: %s) ===%n",
+                user.name(), user.surname(), user.id());
+        writer.println();
+        
+       printFriendsSection(writer, report.friendsReport());
+       writer.println();
+        
+        printGroupsSection(writer, report.groupsReport());
+        writer.println();
+        
+        printPostsSection(writer, report.wallStatistic());
     }
 
     private void printFriendsSection(PrintWriter writer, StatisticReport.FriendsReport friendsReport) {

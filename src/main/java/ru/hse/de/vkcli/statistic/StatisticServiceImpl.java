@@ -29,14 +29,13 @@ import ru.hse.de.vkcli.api.model.wall.WallResponse;
 import ru.hse.de.vkcli.statistic.model.StatisticReport;
 
 public class StatisticServiceImpl implements StatisticService {
-    private static final int MAX_ENTITIES_FETCHING = 5000;
+    private static final int MAX_ENTITIES_FETCHING = 10;
     private static final int MIN_FRIEND_OF_FRIEND_REQUIRED = 50;
     private final VkApi vkApi;
 
     public StatisticServiceImpl(VkApi vkApi) {
         this.vkApi = vkApi;
     }
-
 
     @Override
     public StatisticReport getMostPopularUserInCityReport(int cityId) {
@@ -55,7 +54,7 @@ public class StatisticServiceImpl implements StatisticService {
                 ))
                 .orElseThrow(() -> new RuntimeException("No open profiles found"));
 
-        StatisticReport.FriendsReport friendsReport = calculateFriendsReport(mostPopularUser.id());
+       StatisticReport.FriendsReport friendsReport = calculateFriendsReport(mostPopularUser.id());
         StatisticReport.GroupsReport groupsReport = calculateGroupsReport(mostPopularUser.id());
         StatisticReport.WallStatistic wallStatistic = calculateWallStatistic(mostPopularUser.id());
 
@@ -124,7 +123,7 @@ public class StatisticServiceImpl implements StatisticService {
     private StatisticReport.GroupsReport calculateGroupsReport(String userId) {
         List<Group> groups = asStream(offset -> {
             GroupsResponse response = vkApi.getGroups(userId, offset);
-            return response.group();
+            return response.items();
         })
                 .limit(MAX_ENTITIES_FETCHING)
                 .toList();
